@@ -2524,9 +2524,6 @@
                 getSupabaseCards();
             }, []); 
 
-            const [globalCurrency, setGlobalCurrency] = React.useState(() => parseInt(localStorage.getItem(`${rolePrefix}_globalCurrency`) || '0'));
-            const [gymMedals, setGymMedals] = React.useState(() => JSON.parse(localStorage.getItem(`${rolePrefix}_gymMedals`)) || Array(8).fill(false));
-            const [eliteFourMedals, setEliteFourMedals] = React.useState(() => JSON.parse(localStorage.getItem(`${rolePrefix}_eliteFourMedals`)) || Array(4).fill(false));
             const [isMyTurn, setIsMyTurn] = React.useState(() => JSON.parse(localStorage.getItem(`${rolePrefix}_isMyTurn`)) || true);
             const [showCaptureCoinFlipModal, setShowCaptureCoinFlipModal] = React.useState(false);
             const [captureCoinFlipResult, setCaptureCoinFlipResult] = React.useState(null);
@@ -2534,9 +2531,6 @@
 
             React.useEffect(() => { localStorage.setItem(`${rolePrefix}_gameCards`, JSON.stringify(cards)); }, [cards, rolePrefix]);
             React.useEffect(() => { localStorage.setItem(`${rolePrefix}_pokemonBoxCards`, JSON.stringify(boxCards)); }, [boxCards, rolePrefix]);
-            React.useEffect(() => { localStorage.setItem(`${rolePrefix}_globalCurrency`, globalCurrency.toString()); }, [globalCurrency, rolePrefix]);
-            React.useEffect(() => { localStorage.setItem(`${rolePrefix}_gymMedals`, JSON.stringify(gymMedals)); }, [gymMedals, rolePrefix]);
-            React.useEffect(() => { localStorage.setItem(`${rolePrefix}_eliteFourMedals`, JSON.stringify(eliteFourMedals)); }, [eliteFourMedals, rolePrefix]);
             React.useEffect(() => { localStorage.setItem(`${rolePrefix}_isMyTurn`, JSON.stringify(isMyTurn)); }, [isMyTurn, rolePrefix]);
 
             const updateCardInSlot = React.useCallback((index, cardData) => {
@@ -2555,9 +2549,6 @@
                     return { ...card, isActivePokemon: newIsActive, statuses: newStatuses };
                 }));
             }, []);
-
-            const toggleGymMedal = (index) => setGymMedals(prev => { const n = [...prev]; n[index] = !n[index]; return n; });
-            const toggleEliteFourMedal = (index) => setEliteFourMedals(prev => { const n = [...prev]; n[index] = !n[index]; return n; });
 
             const activeCardForDice = cards.find(c => c && c.isActivePokemon);
             const diceRollDisableStatus = activeCardForDice ? (activeCardForDice.statuses[0] ? 'asleep' : (activeCardForDice.statuses[2] ? 'confused' : (activeCardForDice.statuses[3] ? 'paralyzed' : false))) : false;
@@ -2731,8 +2722,6 @@
                                     <CardSlot key={index} slotIndex={index} cardData={cardData} onUpdateCard={updateCardInSlot} onToggleActivePokemon={handleActivePokemonToggle} isMyTurn={isMyTurn} activeCardParalyzed={diceRollDisableStatus === 'paralyzed'} onSendToBox={sendCardToBox} onRecallFromBox={recallCardFromBox} boxCards={boxCards} pokemonDbCards={pokemonDbCards} trainersDbCards={trainersDbCards} palestreDbCards={palestreDbCards} isDbLoading={isDbLoading} dbError={dbError} onSelectTableAndFetchRandom={fetchRandomCardFromTable} onSelectPalestreCard={handlePalestreCardSelection} role="master" showTemporaryCard={showTemporaryCard} />
                                 ))}
                             </div>
-                            <div className="w-full flex justify-center mt-8"><MedalDisplay gymMedals={gymMedals} onToggleMedal={toggleGymMedal} /></div>
-                            <div className="w-full flex justify-center mt-8 pb-20"><EliteFourDisplay eliteFourMedals={eliteFourMedals} onToggleMedal={toggleEliteFourMedal} /></div>
                         </div>
                     )}
                     {currentView === 'box' && (<BoxView boxCards={boxCards} onBackToMain={() => setCurrentView('main')} onDeleteCardFromBox={deleteCardFromBox} role="master" />)}
