@@ -1724,10 +1724,10 @@
 
 
         // Componenti di visualizzazione (BoxView, NegozioView, etc.)
-        function BoxView({ boxCards, onBackToMain, onDeleteCardFromBox, role }) { 
+        function BoxView({ boxCards, onBackToMain, onDeleteCardFromBox, role, onAddCardToBox, pokemonDbCards, isDbLoading, dbError }) { 
             const [showZoomModal, setShowZoomModal] = React.useState(false);
             const [zoomImageUrl, setZoomImageUrl] = React.useState(null);
-
+            const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
 
             const handleCardClick = (imageUrl) => {
                 setZoomImageUrl(imageUrl);
@@ -1738,7 +1738,10 @@
             return (
                 <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-gray-700 to-gray-900 p-4">
                     <h2 className="text-4xl font-extrabold text-yellow-300 mb-8">{role === 'player' ? 'ZAINO POKÉMON' : 'BOX POKÉMON'}</h2>
-                    <button onClick={onBackToMain} className="btn-theme btn-blue mb-8 px-6 py-3 text-lg">Torna al Gioco</button>
+                    <div className="flex space-x-4 mb-8">
+                        <button onClick={onBackToMain} className="btn-theme btn-blue px-6 py-3 text-lg">Torna al Gioco</button>
+                        <button onClick={() => setIsAddModalOpen(true)} className="btn-theme btn-green px-6 py-3 text-lg">Aggiungi Pokémon</button>
+                    </div>
                     {boxCards.length === 0 ? <p className="text-gray-400 text-xl mt-8">Vuoto.</p> : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 w-full max-w-4xl">
                             {boxCards.map((card, index) => (
@@ -1752,6 +1755,18 @@
                         </div>
                     )}
                     <ZoomModal isOpen={showZoomModal} imageUrl={zoomImageUrl} onClose={() => setShowZoomModal(false)} />
+                    <SelectFromDatabaseModal 
+                        isOpen={isAddModalOpen}
+                        onClose={() => setIsAddModalOpen(false)}
+                        onSelectCardFromDatabase={(card) => {
+                            onAddCardToBox(card);
+                            setIsAddModalOpen(false);
+                        }}
+                        cardsData={pokemonDbCards}
+                        isLoading={isDbLoading}
+                        error={dbError}
+                        title="Aggiungi Pokémon al Box"
+                    />
                 </div>
             );
         }
@@ -2174,6 +2189,10 @@
             };
             const deleteCardFromBox = (index) => setBoxCards(p => p.filter((_, i) => i !== index));
             
+            const addCardToBox = (card) => {
+                setBoxCards(prev => [...prev, {...card, damageTaken: 0, statuses: Array(5).fill(false), isActivePokemon: false, exp: 0}]);
+            };
+
             const addCardToZaino = (card, isPrize = false) => {
                 if (!isPrize && globalCurrency < card.cost) { displayGlobalBanner(`Non hai abbastanza soldi!`, 'purchase_fail'); return; }
                 if (!isPrize) setGlobalCurrency(p => p - card.cost);
@@ -2480,7 +2499,7 @@
                             <div className="w-full flex justify-center mt-8 pb-20"><button onClick={() => setShowClearConfirm(true)} className="flex items-center justify-center w-16 h-16 rounded-full text-4xl shadow-md border-4 bg-red-600 border-red-800 hover:scale-105 active:scale-95" title="Resetta dati giocatore">🗑️</button></div>
                             {showClearConfirm && <div className="zoom-modal-overlay"><div className="zoom-modal-content bg-gray-800 p-6 rounded-xl border-4 border-red-500"><h3 className="text-2xl font-bold text-red-400 mb-6 text-center">Resettare tutti i dati del giocatore?</h3><div className="flex space-x-4"><button onClick={handleFullReset} className="btn-theme btn-red">Sì</button><button onClick={() => setShowClearConfirm(false)} className="btn-theme btn-gray">No</button></div></div></div>}
                         </div>
-                    ) : currentView === 'box' ? <BoxView boxCards={boxCards} onBackToMain={() => setCurrentView('main')} onDeleteCardFromBox={deleteCardFromBox} role="player" />
+                    ) : currentView === 'box' ? <BoxView boxCards={boxCards} onBackToMain={() => setCurrentView('main')} onDeleteCardFromBox={deleteCardFromBox} role="player" onAddCardToBox={addCardToBox} pokemonDbCards={pokemonDbCards} isDbLoading={isDbLoading} dbError={dbError} />
                       : currentView === 'zaino' ? <ZainoView 
                             playerZainoCards={playerZainoCards} 
                             onBackToMain={() => setCurrentView('main')} 
