@@ -1040,7 +1040,7 @@
         }
 
 
-        function AddCardChoiceModal({ isOpen, onClose, onChooseNew, onChooseFromBox, onChooseFromDatabase, onChooseFromSupabaseTable, onChooseFromPalestre }) {
+        function AddCardChoiceModal({ isOpen, onClose, onChooseNew, onChooseFromBox, onChooseFromDatabase, onChooseFromSupabaseTable, onChooseFromPalestre, role }) {
             if (!isOpen) return null;
 
 
@@ -1052,8 +1052,12 @@
                             <button onClick={onChooseNew} className="btn-theme btn-green px-6 py-3 text-lg">Nuova Carta 📸</button>
                             <button onClick={onChooseFromBox} className="btn-theme btn-blue px-6 py-3 text-lg">Dal Box 📦</button>
                             <button onClick={onChooseFromDatabase} className="btn-theme btn-yellow px-6 py-3 text-lg">Dal Database 📚</button>
-                            <button onClick={onChooseFromSupabaseTable} className="btn-theme btn-orange px-6 py-3 text-lg">Casuale da Tabella 🎲</button>
-                            <button onClick={onChooseFromPalestre} className="btn-theme btn-purple px-6 py-3 text-lg">Da Palestre 🏛️</button>
+                            {role !== 'player' && (
+                                <>
+                                    <button onClick={onChooseFromSupabaseTable} className="btn-theme btn-orange px-6 py-3 text-lg">Casuale da Tabella 🎲</button>
+                                    <button onClick={onChooseFromPalestre} className="btn-theme btn-purple px-6 py-3 text-lg">Da Palestre 🏛️</button>
+                                </>
+                            )}
                         </div>
                         <button onClick={onClose} className="btn-theme btn-red mt-8 px-6 py-2 text-lg">Annulla</button>
                     </div>
@@ -1413,7 +1417,7 @@
                     <SelectFromDatabaseModal isOpen={showEvolveModal} onClose={() => setShowEvolveModal(false)} onSelectCardFromDatabase={handleSelectEvolution} cardsData={pokemonDbCards} isLoading={isDbLoading} error={dbError} title="Seleziona Evoluzione" />
                     <SelectFromSupabaseTableModal isOpen={showSelectFromSupabaseTableModal} onClose={() => setShowSelectFromSupabaseTableModal(false)} onSelectTableAndFetchRandom={handleSelectRandomCardFromTable} />
                     <SelectFromPalestreModal isOpen={showSelectFromPalestreModal} onClose={() => setShowSelectFromPalestreModal(false)} onSelectCardFromPalestre={handleSelectCardFromPalestreCallback} cardsData={palestreDbCards} isLoading={isDbLoading} error={dbError} />
-                    <AddCardChoiceModal isOpen={showAddCardChoiceModal} onClose={() => setShowAddCardChoiceModal(false)} onChooseNew={handleChooseNewCard} onChooseFromBox={handleChooseFromBox} onChooseFromDatabase={handleChooseFromDatabase} onChooseFromSupabaseTable={handleChooseFromSupabaseTable} onChooseFromPalestre={handleChooseFromPalestre} />
+                    <AddCardChoiceModal isOpen={showAddCardChoiceModal} onClose={() => setShowAddCardChoiceModal(false)} onChooseNew={handleChooseNewCard} onChooseFromBox={handleChooseFromBox} onChooseFromDatabase={handleChooseFromDatabase} onChooseFromSupabaseTable={handleChooseFromSupabaseTable} onChooseFromPalestre={handleChooseFromPalestre} role={role} />
                 </div>
             );
         }
